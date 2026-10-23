@@ -1,0 +1,464 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Finnp</title>
+<meta name="description" content="Finnp ist die Sammelstelle für ein paar Videos vom YouTube-Kanal Fi (@Fi.29).">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Layout: linksbündiger Wortmarken-Kopf, darunter Jahres-Reiter mit Video-Raster, Kanal-Karte als Abschluss. */
+:root {
+  --bg: #f2f0f8;
+  --surface: #ffffff;
+  --fg: #17141f;
+  --muted: #615b72;
+  --line: #d9d5e6;
+  --accent: #4a3df0;
+  --accent-fg: #ffffff;
+  --new: #ffd23f;
+  --new-fg: #2a2100;
+  --deco-rgb: 74, 61, 240;
+  --deco-a: 0.1;
+  --font-display: "Bricolage Grotesque", "Helvetica Neue", Arial, sans-serif;
+  --font-body: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121018; --surface: #1c1926; --fg: #f1eefb; --muted: #a39cb8;
+    --line: #2f2a3f; --accent: #9a8cff; --accent-fg: #14101f;
+    --new: #ffd23f; --new-fg: #2a2100;
+    --deco-rgb: 255, 255, 255; --deco-a: 0.07;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121018; --surface: #1c1926; --fg: #f1eefb; --muted: #a39cb8;
+  --line: #2f2a3f; --accent: #9a8cff; --accent-fg: #14101f;
+  --new: #ffd23f; --new-fg: #2a2100;
+  --deco-rgb: 255, 255, 255; --deco-a: 0.07;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.55;
+  padding-block: 0;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+a { color: inherit; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+
+.wrap { max-width: 68rem; margin-inline: auto; position: relative; z-index: 1; }
+#bg { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; display: block; }
+
+/* Kopf */
+.top {
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  padding-block: 1.25rem;
+}
+.mark {
+  font-family: var(--font-display); font-weight: 800; font-size: 1.35rem;
+  letter-spacing: -0.02em; text-decoration: none;
+}
+.mark span { color: var(--accent); }
+.btn {
+  display: inline-block; text-decoration: none; font-weight: 700; font-size: .95rem;
+  background: var(--accent); color: var(--accent-fg);
+  padding: .65rem 1.2rem; border-radius: 999px; border: 1px solid var(--accent);
+}
+.btn:hover { filter: brightness(1.08); }
+.btn.ghost { background: transparent; color: var(--fg); border-color: var(--line); font-weight: 500; }
+.btn.ghost:hover { border-color: var(--accent); filter: none; }
+
+/* Hero */
+.hero { padding-block: clamp(.25rem, 1.5vw, 1rem) clamp(2rem, 5vw, 3.5rem); }
+.hero h1 {
+  font-family: var(--font-display); font-weight: 800;
+  font-size: clamp(4.5rem, 21vw, 13rem);
+  line-height: .86; letter-spacing: -0.05em; margin: 0;
+}
+.hero h1 i { font-style: normal; color: var(--accent); }
+.hero p {
+  max-width: 34rem; margin: 1.5rem 0 0;
+  font-size: clamp(1.05rem, 2.4vw, 1.3rem); color: var(--muted);
+}
+
+/* Reiter */
+.section-label {
+  font-family: var(--font-mono); font-size: .78rem; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--muted); margin: 0 0 1rem;
+}
+.tabs {
+  display: flex; flex-wrap: wrap; gap: .5rem; margin: 0 0 1.75rem; padding: 0;
+  border-bottom: 1px solid var(--line); padding-bottom: .9rem;
+}
+.tab {
+  appearance: none; cursor: pointer; font: inherit;
+  font-family: var(--font-display); font-weight: 800; font-size: clamp(1.3rem, 4vw, 1.8rem);
+  letter-spacing: -.02em; line-height: 1;
+  color: var(--fg); background: transparent;
+  border: 1px solid transparent; border-radius: 999px; padding: .5rem 1.1rem;
+  display: inline-flex; align-items: center; gap: .6rem;
+}
+.tab:hover { color: var(--fg); border-color: var(--line); }
+.tab[aria-selected="true"] { color: var(--accent-fg); background: var(--accent); border-color: var(--accent); }
+.tab small { font-family: var(--font-mono); font-weight: 500; font-size: .7rem; letter-spacing: 0; opacity: .8; }
+.tab .dot { width: .5rem; height: .5rem; border-radius: 50%; background: var(--new); }
+/* Zukünftige Jahre: keine Schaltflächen, werden von Jahr zu Jahr blasser */
+.tab.future { cursor: default; pointer-events: none; user-select: none; color: var(--muted); border-style: dashed; border-color: var(--line); }
+
+/* Videos */
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr)); gap: 1.75rem 1.25rem; }
+.card { min-width: 0; display: flex; flex-direction: column; gap: .6rem; }
+.frame {
+  position: relative; width: 100%; aspect-ratio: 16 / 9; max-width: 100%;
+  border-radius: 14px; overflow: hidden; background: var(--surface);
+  border: 1px solid var(--line);
+}
+.frame iframe, .frame img { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; object-fit: cover; }
+.thumb { all: unset; cursor: pointer; position: absolute; inset: 0; display: block; }
+.thumb:focus-visible { outline: 3px solid var(--accent); outline-offset: -3px; }
+.play {
+  position: absolute; left: 50%; top: 50%; translate: -50% -50%;
+  width: clamp(3.25rem, 9vw, 4.25rem); aspect-ratio: 1; border-radius: 50%;
+  background: var(--accent); display: grid; place-items: center;
+  transition: scale .15s ease;
+}
+.play::after {
+  content: ""; margin-left: 8%;
+  border-style: solid; border-width: .6rem 0 .6rem 1rem;
+  border-color: transparent transparent transparent var(--accent-fg);
+}
+.thumb:hover .play { scale: 1.08; }
+.card h3 {
+  font-family: var(--font-display); font-weight: 500; font-size: 1.2rem;
+  line-height: 1.25; margin: .25rem 0 0; text-wrap: balance;
+  display: flex; align-items: baseline; gap: .6rem; flex-wrap: wrap;
+}
+.badge {
+  font-family: var(--font-mono); font-weight: 500; font-size: .7rem; letter-spacing: .08em;
+  text-transform: uppercase; background: var(--new); color: var(--new-fg);
+  padding: .15rem .55rem; border-radius: 999px; line-height: 1.4;
+}
+.desc { margin: 0; color: var(--muted); font-size: .95rem; }
+.card a.yt { font-size: .85rem; color: var(--muted); }
+
+/* Kanal */
+.channel { padding-block: clamp(3rem, 8vw, 5.5rem); }
+.channel-card {
+  display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 1.5rem 1.75rem; align-items: center;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 18px;
+  padding: clamp(1.25rem, 4vw, 2.25rem);
+}
+.avatar {
+  width: clamp(4.5rem, 14vw, 7rem); aspect-ratio: 1; border-radius: 50%;
+  background: var(--accent); color: var(--accent-fg);
+  display: grid; place-items: center;
+  font-family: var(--font-display); font-weight: 800; font-size: clamp(1.8rem, 6vw, 3rem);
+}
+.channel-card h2 { font-family: var(--font-display); font-weight: 800; font-size: clamp(1.8rem, 5vw, 2.6rem); line-height: 1; margin: 0 0 .6rem; letter-spacing: -.02em; }
+.facts { display: flex; flex-wrap: wrap; gap: .4rem 1.25rem; margin: 0 0 1.25rem; padding: 0; list-style: none; font-family: var(--font-mono); font-size: .85rem; color: var(--muted); }
+.facts li { overflow-wrap: anywhere; }
+.about { margin: 0 0 1.25rem; max-width: 40rem; color: var(--muted); }
+.about:empty { display: none; }
+.actions { display: flex; flex-wrap: wrap; gap: .6rem; }
+
+footer { padding-block: 0 2.5rem; font-size: .85rem; color: var(--muted); }
+
+@media (max-width: 40rem) {
+  .channel-card { grid-template-columns: minmax(0, 1fr); }
+}
+@media (prefers-reduced-motion: reduce) { .play { transition: none; } }
+</style>
+</head>
+<body>
+<canvas id="bg" aria-hidden="true"></canvas>
+<div class="wrap">
+
+  <header class="top">
+    <a class="mark" href="#">Finnp<span>.</span></a>
+    <a class="btn" href="https://www.youtube.com/@Fi.29?sub_confirmation=1" target="_blank" rel="noopener">Abonnieren</a>
+  </header>
+
+  <section class="hero">
+    <h1>Finnp<i>.</i></h1>
+    <p>Ein paar Videos von Fi, an einem Ort. Draufklicken und es läuft.</p>
+  </section>
+
+  <main>
+    <h2 class="section-label" id="videos">Videos nach Jahr</h2>
+    <div class="tabs" id="tabs" role="tablist" aria-labelledby="videos"></div>
+    <div class="grid" id="grid" role="tabpanel"></div>
+  </main>
+
+  <section class="channel" aria-labelledby="kanal">
+    <h2 class="section-label" id="kanal">Der Kanal</h2>
+    <div class="channel-card">
+      <div class="avatar" aria-hidden="true">Fi</div>
+      <div>
+        <h2>Fi</h2>
+        <ul class="facts">
+          <li>@Fi.29</li>
+          <li>6 Abonnenten</li>
+          <li>dabei seit 11.10.2020</li>
+        </ul>
+        <!-- TEXTFELD: Zwischen <p class="about"> und </p> den eigenen Text eintragen -->
+        <p class="about">Hallo, ich bin Finn und das sind meine Urlaubsfilme von den letzten Jahren. Abo nicht vergessen :)</p>
+        <div class="actions">
+          <a class="btn" href="https://www.youtube.com/@Fi.29?sub_confirmation=1" target="_blank" rel="noopener">Abonnieren</a>
+          <a class="btn ghost" href="https://www.youtube.com/@Fi.29" target="_blank" rel="noopener">Kanal öffnen</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>Finnp &middot; Videos von <a href="https://www.youtube.com/@Fi.29" target="_blank" rel="noopener">youtube.com/@Fi.29</a></footer>
+</div>
+
+<script>
+/* ------------------------------------------------------------
+   HIER DIE VIDEOS PFLEGEN
+   Pro Jahr eine Liste. Pro Video:
+     url:   YouTube-Link
+     title: Titel des Videos
+     text:  kurzer Satz dazu (darf leer bleiben)
+   Mit neu: true bekommt ein Video das gelbe "Neu"-Label.
+------------------------------------------------------------ */
+const YEARS = [
+  { year: 2024, videos: [
+    { url: "https://youtu.be/sHelNy6Hr8g", title: "Schweiz 2024", text: "Mein Agriviva-Einsatz im Sommer 2024 in Grindelwald, Schweiz" },
+    { url: "https://youtu.be/gYvnbJL8O2k", title: "Norwegen 2024/25", text: "Der Norwegen-Wintertrip über die Jahreswende 2024/25 in Sunndal, Norwegen" },
+  ]},
+  { year: 2025, videos: [
+    { url: "https://youtu.be/t_m0oYk230o", title: "Nürburgring 2025", text: "Das 24h-Rennen 2025 am Nürburgring in der Eifel, Deutschland" },
+    { url: "https://youtu.be/Th740cC5TaA", title: "Schweiz 2025", text: "Der Wander- und Hochtourenurlaub im Saas-Tal im Wallis, Schweiz" },
+  ]},
+  { year: 2026, videos: [
+    { url: "https://youtu.be/Vrzf76zY07A", title: "Alpen + Italien 2026", text: "Kombination aus dem Alpen- und dem Italienfilm im Sommer 2026", neu: true },
+    { url: "https://youtu.be/W6iyEIh3mPo", title: "Alpen 2026", text: "Der Wanderurlaub in den Dolomiten, Italien und in Pontresina, Schweiz 2026", neu: true },
+    { url: "https://youtu.be/CBfkkanmEv4", title: "Italien 2026", text: "Der Jungs-Trip in der Toskana und dem Gardasee 2026", neu: true },
+  ]},
+];
+
+function videoId(url) {
+  try {
+    const u = new URL(url);
+    if (u.hostname === "youtu.be") return u.pathname.slice(1, 12);
+    if (u.pathname.startsWith("/shorts/") || u.pathname.startsWith("/embed/")) return u.pathname.split("/")[2];
+    return u.searchParams.get("v");
+  } catch (e) { return null; }
+}
+
+const tabsEl = document.getElementById("tabs");
+const grid = document.getElementById("grid");
+
+function renderYear(entry) {
+  grid.replaceChildren();
+  grid.setAttribute("aria-label", "Videos " + entry.year);
+  entry.videos.forEach((raw, i) => {
+    const id = videoId(raw.url);
+    if (!id) return;
+    const title = raw.title || ("Video " + (i + 1) + " aus " + entry.year);
+
+    const card = document.createElement("article");
+    card.className = "card";
+
+    const frame = document.createElement("div");
+    frame.className = "frame";
+    const btn = document.createElement("button");
+    btn.className = "thumb";
+    btn.type = "button";
+    btn.setAttribute("aria-label", title + " abspielen");
+    btn.innerHTML = '<img loading="lazy" alt="" src="https://i.ytimg.com/vi/' + id + '/hqdefault.jpg"><span class="play"></span>';
+    btn.addEventListener("click", () => {
+      /* YouTube blockiert Einbettungen von file:// (Fehler 153). Lokal öffnet der Klick YouTube, online läuft das Video direkt auf der Seite. */
+      if (location.protocol === "file:") {
+        window.open("https://www.youtube.com/watch?v=" + id, "_blank", "noopener");
+        return;
+      }
+      const f = document.createElement("iframe");
+      f.referrerPolicy = "strict-origin-when-cross-origin";
+      f.src = "https://www.youtube-nocookie.com/embed/" + id + "?autoplay=1&rel=0";
+      f.title = title;
+      f.allow = "autoplay; encrypted-media; picture-in-picture; fullscreen";
+      f.allowFullscreen = true;
+      frame.replaceChildren(f);
+    });
+    frame.appendChild(btn);
+
+    const h = document.createElement("h3");
+    if (raw.neu) {
+      const b = document.createElement("span");
+      b.className = "badge";
+      b.textContent = "Neu";
+      h.appendChild(b);
+    }
+    h.appendChild(document.createTextNode(title));
+
+    card.append(frame, h);
+
+    if (raw.text) {
+      const p = document.createElement("p");
+      p.className = "desc";
+      p.textContent = raw.text;
+      card.appendChild(p);
+    }
+
+    const a = document.createElement("a");
+    a.className = "yt";
+    a.href = "https://www.youtube.com/watch?v=" + id;
+    a.target = "_blank";
+    a.rel = "noopener";
+    a.textContent = "Auf YouTube ansehen";
+    card.appendChild(a);
+
+    grid.appendChild(card);
+  });
+}
+
+function select(year, push) {
+  const entry = YEARS.find(y => String(y.year) === String(year)) || YEARS[YEARS.length - 1];
+  tabsEl.querySelectorAll(".tab").forEach(t => {
+    const on = t.dataset.year === String(entry.year);
+    t.setAttribute("aria-selected", on ? "true" : "false");
+    t.tabIndex = on ? 0 : -1;
+  });
+  renderYear(entry);
+  if (push) history.replaceState(null, "", "#" + entry.year);
+}
+
+YEARS.forEach(y => {
+  const t = document.createElement("button");
+  t.type = "button";
+  t.className = "tab";
+  t.setAttribute("role", "tab");
+  t.dataset.year = y.year;
+  t.append(String(y.year));
+  const hasNew = y.videos.some(v => v.neu);
+  const small = document.createElement("small");
+  small.textContent = y.videos.length + (y.videos.length === 1 ? " Video" : " Videos");
+  t.appendChild(small);
+  if (hasNew) {
+    const d = document.createElement("span");
+    d.className = "dot";
+    d.title = "Neue Videos";
+    t.appendChild(d);
+  }
+  t.addEventListener("click", () => select(y.year, true));
+  t.addEventListener("keydown", e => {
+    const tabs = [...tabsEl.querySelectorAll(".tab")];
+    const i = tabs.indexOf(t);
+    let n = null;
+    if (e.key === "ArrowRight") n = tabs[(i + 1) % tabs.length];
+    if (e.key === "ArrowLeft") n = tabs[(i - 1 + tabs.length) % tabs.length];
+    if (n) { e.preventDefault(); n.focus(); select(n.dataset.year, true); }
+  });
+  tabsEl.appendChild(t);
+});
+
+/* Die Jahre danach: noch nicht geschrieben, darum nicht anklickbar und immer blasser */
+for (let i = 0; i < 4; i++) {
+  const f = document.createElement("span");
+  f.className = "tab future";
+  f.setAttribute("aria-hidden", "true");
+  f.title = "Steht noch in den Sternen";
+  f.style.opacity = (0.6 - i * (0.5 / 3)).toFixed(2);
+  f.append(String(2027 + i));
+  tabsEl.appendChild(f);
+}
+
+/* Hintergrund: sehr zarte Schnörkel und Fließlinien, nur Zierde */
+(function () {
+  const cv = document.getElementById("bg");
+  const ctx = cv.getContext("2d");
+  if (!ctx) return;
+  let lastW = 0, lastH = 0;
+
+  function rng(seed) {
+    return function () {
+      seed |= 0; seed = (seed + 0x6D2B79F5) | 0;
+      let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  function draw() {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const w = window.innerWidth, h = window.innerHeight;
+    lastW = w; lastH = h;
+    cv.width = Math.round(w * dpr);
+    cv.height = Math.round(h * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, w, h);
+
+    const cs = getComputedStyle(document.documentElement);
+    const rgb = cs.getPropertyValue("--deco-rgb").trim() || "255, 255, 255";
+    const base = parseFloat(cs.getPropertyValue("--deco-a")) || 0.07;
+    const col = a => "rgba(" + rgb + "," + a.toFixed(3) + ")";
+    const r = rng(29);
+
+    /* Fließlinien, die an den Enden auslaufen */
+    const ang = (x, y) => (Math.sin(x * 0.0045 + 1.3) + Math.cos(y * 0.0052 + 0.7) + Math.sin((x - y) * 0.0031 + 2.1)) * 1.25;
+    const count = Math.max(14, Math.min(46, Math.round(w * h / 26000)));
+    ctx.lineWidth = 1;
+    ctx.lineCap = "round";
+    for (let n = 0; n < count; n++) {
+      let x = r() * w, y = r() * h;
+      const steps = 90 + Math.floor(r() * 130);
+      for (let s = 0; s < steps; s++) {
+        const a = ang(x, y);
+        const nx = x + Math.cos(a) * 2.6, ny = y + Math.sin(a) * 2.6;
+        ctx.strokeStyle = col(base * 0.8 * Math.sin(Math.PI * s / steps));
+        ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(nx, ny); ctx.stroke();
+        x = nx; y = ny;
+      }
+    }
+
+    /* Schnörkel: doppelte Spiralen mit Auslauf */
+    const curls = [[0.1, 0.22, 0.09], [0.92, 0.5, 0.11], [0.18, 0.88, 0.075]];
+    curls.forEach(function (c, ci) {
+      const cx = c[0] * w, cy = c[1] * h, r0 = c[2] * Math.max(w, h) * 0.55;
+      for (let k = 0; k < 2; k++) {
+        const scale = k ? 0.86 : 1, phase = ci * 1.7 + (k ? 0.35 : 0);
+        ctx.strokeStyle = col(base);
+        ctx.beginPath();
+        for (let t = -2.4; t <= 15.7; t += 0.06) {
+          const rad = r0 * scale * Math.exp(-0.17 * t);
+          const px = cx + rad * Math.cos(t + phase), py = cy + rad * Math.sin(t + phase);
+          if (t === -2.4) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+        }
+        ctx.stroke();
+      }
+    });
+  }
+
+  draw();
+  let timer = 0;
+  window.addEventListener("resize", function () {
+    if (Math.abs(window.innerWidth - lastW) < 2 && Math.abs(window.innerHeight - lastH) < 120) return;
+    clearTimeout(timer);
+    timer = setTimeout(draw, 150);
+  });
+  try {
+    window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", draw);
+    new MutationObserver(draw).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+  } catch (e) {}
+})();
+
+select(location.hash.slice(1) || YEARS[YEARS.length - 1].year, false);
+</script>
+</body>
+</html>
